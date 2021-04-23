@@ -1,7 +1,8 @@
 from django.urls import path
+from rest_framework.routers import SimpleRouter
 
-from .views import TestView
-urlpatterns = [
-    path(r'<str:action>', TestView.as_view()),
+from .views import TestViewSet
 
-]
+router = SimpleRouter()
+router.register(r'test', TestViewSet, 'test')
+urlpatterns = router.urls

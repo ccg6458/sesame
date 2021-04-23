@@ -1,11 +1,16 @@
 from django.shortcuts import render
-from util.view import BaseView
+from util.view import BaseViewSet
+from rest_framework.decorators import action
 
 
 # Create your views here.
 
-class TestView(BaseView):
-    get_actions = ['test']
+class TestViewSet(BaseViewSet):
 
-    def test(self, request):
+    @action(methods=['get', 'post', 'put'], detail=False)
+    def aaa(self, request):
+        return self.json()
+
+    @action(methods=['get', 'post', 'put'], detail=False, permission_classes=[])
+    def bbb(self, request):
         return self.json()
