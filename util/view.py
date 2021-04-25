@@ -19,7 +19,8 @@ class BaseViewSet(ViewSet):
     """
     authentication_classes = (BasicAuthentication, CsrfExemptSessionAuthentication)
 
-    def json(self, code=0, message=None, data=[], **kwargs):
+    @staticmethod
+    def json(code=0, message=None, data=None, **kwargs):
         """
 
         :param code: 返回状态码
@@ -28,7 +29,9 @@ class BaseViewSet(ViewSet):
         :param kwargs: 其他参数
         :return: 封装Response
         """
-        if not message:
+        if data is None:
+            data = []
+        if message is None:
             message = Code.code_msg.get(code, Code.code_unknow_msg)
         ret = {
             'code': code,

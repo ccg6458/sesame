@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from util.view import BaseViewSet
 from rest_framework.decorators import action
 
