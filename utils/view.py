@@ -56,10 +56,10 @@ class CURDMixin:
                     raise Exception('参数缺失：{}'.format(require_param))
             instance = model(**data)
             instance.save()
-            self.message = '主机创建成功'
+            self.message = '{}创建成功'.format(model._meta.app_label)
         except Exception as e:
             self.code = 5000
-            self.message = '主机创建失败：{}'.format(e.args)
+            self.message = '{}创建失败：{}'.format(model._meta.app_label, e.args)
 
         return BaseResponse.json(self.code, self.message)
 
@@ -70,9 +70,6 @@ class CURDMixin:
             query_set = model.objects.all()
             for query in query_set:
                 data.append(query.to_dict())
-        except ObjectDoesNotExist as e:
-            self.code = 5000
-            self.message = '资源不存在：{}'.format(e.args)
         except Exception as e:
             self.code = 5000
             self.message = '未知错误：{}'.format(e.args)
@@ -100,10 +97,10 @@ class CURDMixin:
             data = request.data
             query = model.objects.filter(id=pk)
             if len(query) == 0:
-                raise ObjectDoesNotExist('Host not matching query ：id={}'.format(pk))
+                raise ObjectDoesNotExist('{} not matching query ：id={}'.format(model._meta.app_label, pk))
             data['modify_time'] = datetime.datetime.now()
             query.update(**data)
-            self.message = '主机修改成功'
+            self.message = '{}修改成功'.format(model._meta.app_label)
         except ObjectDoesNotExist as e:
             self.code = 5000
             self.message = '资源不存在：{}'.format(e.args)
