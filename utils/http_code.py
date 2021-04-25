@@ -45,3 +45,4 @@ class Code():
     }
 
     code_unknow_msg = '未知错误'
+    default_msg = code_msg.get(Ok)
