@@ -45,3 +45,37 @@ class HostViewSet(BaseViewSet):
             message = '未知错误：{}'.format(e.args)
 
         return self.json(code, message, data)
+
+    def list(self, request):
+        code = 0
+        message = self.get_message(code)
+        data = []
+        try:
+            query_set = Host.objects.all()
+            for query in query_set:
+                data.append(query.to_dict())
+        except ObjectDoesNotExist as e:
+            code = 5000
+            message = '资源不存在：{}'.format(e.args)
+        except Exception as e:
+            code = 5000
+            message = '未知错误：{}'.format(e.args)
+
+        return self.json(code, message, data)
+
+    def retrieve(self, request, pk):
+        code = 0
+        message = self.get_message(code)
+        data = []
+        try:
+
+            query = Host.objects.get(id=pk)
+            data = query.to_dict()
+        except ObjectDoesNotExist as e:
+            code = 5000
+            message = '资源不存在：{}'.format(e.args)
+        except Exception as e:
+            code = 5000
+            message = '未知错误：{}'.format(e.args)
+
+        return self.json(code, message, data)
