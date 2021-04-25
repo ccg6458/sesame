@@ -44,7 +44,7 @@ class CURDMixin:
     model = None
     code = Code.Ok
     message = Code.default_msg
-    create_require_params = []
+    create_require_params = []  # 执行create方法时的必备参数列表，无则为空
 
     def create(self, request):
         model = self.model
