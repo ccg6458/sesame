@@ -1,4 +1,4 @@
-from util.view import BaseViewSet
+from utils.view import BaseViewSet
 from rest_framework.decorators import action
 
 
