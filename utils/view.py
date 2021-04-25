@@ -98,11 +98,10 @@ class CURDMixin:
         model_name = self.model._meta.verbose_name
         try:
             data = request.data
-            query = model.objects.filter(id=pk)
-            if len(query) == 0:
-                raise ObjectDoesNotExist('{} not matching query ：id={}'.format(model_name, pk))
+            obj = model.objects.get(id=pk)
             data['modify_time'] = datetime.datetime.now()
-            query.update(**data)
+            obj.__dict__.update(**data)
+            obj.save()
             self.message = '{}修改成功'.format(model_name)
         except ObjectDoesNotExist as e:
             self.code = 5000

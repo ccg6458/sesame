@@ -10,6 +10,7 @@ class Host(models.Model):
     cpu = models.CharField(max_length=64, verbose_name='cpu', null=True)
     memory = models.CharField(max_length=64, verbose_name='memory', null=True)
     disk = models.CharField(max_length=256, verbose_name='disk', null=True)
+    status = models.SmallIntegerField(verbose_name='状态', default=1)
     create_time = models.DateTimeField(auto_now_add=True)
     modify_time = models.DateTimeField(auto_now=True)
 
@@ -23,3 +24,4 @@ class Host(models.Model):
             if field_name not in __exclude_fields:
                 data[field_name] = getattr(self, field_name)
         return data
+
