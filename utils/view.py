@@ -13,14 +13,9 @@ class CsrfExemptSessionAuthentication(SessionAuthentication):
         return  # To not perform the csrf check previously happening
 
 
-class BaseViewSet(ViewSet):
-    """
-    重写ViewSet，添加自定义response方法
-    """
-    authentication_classes = (BasicAuthentication, CsrfExemptSessionAuthentication)
+class BaseResponse:
 
-    @staticmethod
-    def json(code=0, message=None, data=None, **kwargs):
+    def json(self, code=0, message=None, data=None, **kwargs):
         """
 
         :param code: 返回状态码
@@ -32,7 +27,7 @@ class BaseViewSet(ViewSet):
         if data is None:
             data = []
         if message is None:
-            message = Code.code_msg.get(code, Code.code_unknow_msg)
+            message = self.get_message(code)
         ret = {
             'code': code,
             'message': message,
@@ -40,3 +35,15 @@ class BaseViewSet(ViewSet):
         }
         response = Response(ret, **kwargs)
         return response
+
+    @staticmethod
+    def get_message(code=0):
+        message = Code.code_msg.get(code, Code.code_unknow_msg)
+        return message
+
+
+class BaseViewSet(ViewSet, BaseResponse):
+    """
+    重写ViewSet，添加自定义response方法
+    """
+    authentication_classes = (BasicAuthentication, CsrfExemptSessionAuthentication)
