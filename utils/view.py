@@ -1,7 +1,9 @@
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
+from django.core.exceptions import ObjectDoesNotExist
 from .http_code import Code
+import datetime
 
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
@@ -15,7 +17,8 @@ class CsrfExemptSessionAuthentication(SessionAuthentication):
 
 class BaseResponse:
 
-    def json(self, code=0, message=None, data=None, **kwargs):
+    @staticmethod
+    def json(code=0, message=None, data=None, **kwargs):
         """
 
         :param code: 返回状态码
@@ -27,7 +30,7 @@ class BaseResponse:
         if data is None:
             data = []
         if message is None:
-            message = self.get_message(code)
+            message = Code.code_msg.get(code, Code.code_unknow_msg)
         ret = {
             'code': code,
             'message': message,
@@ -36,13 +39,82 @@ class BaseResponse:
         response = Response(ret, **kwargs)
         return response
 
-    @staticmethod
-    def get_message(code=0):
-        message = Code.code_msg.get(code, Code.code_unknow_msg)
-        return message
+
+class CURDMixin:
+    model = None
+    code = Code.Ok
+    message = Code.default_msg
+
+    def create(self, request):
+        model = self.model
+        require_params = ['private_ip']
+        try:
+            data = request.data
+            params = data.keys()
+            for require_param in require_params:
+                if require_param not in params:
+                    raise Exception('参数缺失：{}'.format(require_param))
+            instance = model(**data)
+            instance.save()
+            self.message = '主机创建成功'
+        except Exception as e:
+            self.code = 5000
+            self.message = '主机创建失败：{}'.format(e.args)
+
+        return BaseResponse.json(self.code, self.message)
+
+    def list(self, request):
+        model = self.model
+        data = []
+        try:
+            query_set = model.objects.all()
+            for query in query_set:
+                data.append(query.to_dict())
+        except ObjectDoesNotExist as e:
+            self.code = 5000
+            self.message = '资源不存在：{}'.format(e.args)
+        except Exception as e:
+            self.code = 5000
+            self.message = '未知错误：{}'.format(e.args)
+
+        return BaseResponse.json(self.code, self.message, data=data)
+
+    def retrieve(self, request, pk):
+        model = self.model
+        data = []
+        try:
+            query = model.objects.get(id=pk)
+            data = query.to_dict()
+        except ObjectDoesNotExist as e:
+            self.code = 5000
+            self.message = '资源不存在：{}'.format(e.args)
+        except Exception as e:
+            self.code = 5000
+            self.message = '未知错误：{}'.format(e.args)
+
+        return BaseResponse.json(self.code, self.message, data)
+
+    def update(self, request, pk):
+        model = self.model
+        try:
+            data = request.data
+            query = model.objects.filter(id=pk)
+            if len(query) == 0:
+                raise ObjectDoesNotExist('Host not matching query ：id={}'.format(pk))
+            data['modify_time'] = datetime.datetime.now()
+            query.update(**data)
+            self.message = '主机修改成功'
+        except ObjectDoesNotExist as e:
+            self.code = 5000
+            self.message = '资源不存在：{}'.format(e.args)
+        except Exception as e:
+            self.code = 5000
+            self.message = '未知错误：{}'.format(e.args)
+
+        return BaseResponse.json(self.code, self.message)
 
 
-class BaseViewSet(ViewSet, BaseResponse):
+class BaseViewSet(ViewSet, BaseResponse, CURDMixin):
     """
     重写ViewSet，添加自定义response方法
     """
