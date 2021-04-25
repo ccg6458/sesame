@@ -44,14 +44,14 @@ class CURDMixin:
     model = None
     code = Code.Ok
     message = Code.default_msg
+    create_require_params = []
 
     def create(self, request):
         model = self.model
-        require_params = ['private_ip']
         try:
             data = request.data
             params = data.keys()
-            for require_param in require_params:
+            for require_param in self.create_require_params:
                 if require_param not in params:
                     raise Exception('参数缺失：{}'.format(require_param))
             instance = model(**data)

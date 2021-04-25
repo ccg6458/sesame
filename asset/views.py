@@ -8,6 +8,7 @@ from .models import Host
 
 class HostViewSet(BaseViewSet):
     model = Host
+    create_require_params = ['private_ip']
 
     @action(detail=False)
     def describe(self, request):
