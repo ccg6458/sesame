@@ -15,7 +15,6 @@ class Host(models.Model):
     modify_time = models.DateTimeField(auto_now=True)
 
     def to_dict(self):
-        __dict_fields = [field.name for field in self._meta.fields]
         __exclude_fields = []
         data = {}
         # 序列化逻辑简单，直接获取实例属性即可
@@ -24,4 +23,3 @@ class Host(models.Model):
             if field_name not in __exclude_fields:
                 data[field_name] = getattr(self, field_name)
         return data
-
