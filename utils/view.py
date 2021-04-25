@@ -48,6 +48,7 @@ class CURDMixin:
 
     def create(self, request):
         model = self.model
+        model_name = self.model._meta.verbose_name
         try:
             data = request.data
             params = data.keys()
@@ -56,10 +57,11 @@ class CURDMixin:
                     raise Exception('参数缺失：{}'.format(require_param))
             instance = model(**data)
             instance.save()
-            self.message = '{}创建成功'.format(model._meta.app_label)
+            self.message = '{}创建成功'.format(model_name)
+
         except Exception as e:
             self.code = 5000
-            self.message = '{}创建失败：{}'.format(model._meta.app_label, e.args)
+            self.message = '{}创建失败：{}'.format(model_name, e.args)
 
         return BaseResponse.json(self.code, self.message)
 
@@ -93,14 +95,15 @@ class CURDMixin:
 
     def update(self, request, pk):
         model = self.model
+        model_name = self.model._meta.verbose_name
         try:
             data = request.data
             query = model.objects.filter(id=pk)
             if len(query) == 0:
-                raise ObjectDoesNotExist('{} not matching query ：id={}'.format(model._meta.app_label, pk))
+                raise ObjectDoesNotExist('{} not matching query ：id={}'.format(model_name, pk))
             data['modify_time'] = datetime.datetime.now()
             query.update(**data)
-            self.message = '{}修改成功'.format(model._meta.app_label)
+            self.message = '{}修改成功'.format(model_name)
         except ObjectDoesNotExist as e:
             self.code = 5000
             self.message = '资源不存在：{}'.format(e.args)
