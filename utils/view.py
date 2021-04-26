@@ -1,4 +1,5 @@
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from django.core.exceptions import ObjectDoesNotExist
@@ -118,3 +119,4 @@ class BaseViewSet(ViewSet, BaseResponse, CURDMixin):
     重写ViewSet，添加自定义response方法
     """
     authentication_classes = (BasicAuthentication, CsrfExemptSessionAuthentication)
+    permission_classes = [IsAuthenticated]
