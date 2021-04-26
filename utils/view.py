@@ -119,5 +119,5 @@ class BaseViewSet(ViewSet, BaseResponse, CURDMixin):
     """
     重写ViewSet，添加自定义response方法
     """
-    authentication_classes = (BasicAuthentication, JWTAuthentication)
+    authentication_classes = [BasicAuthentication, JWTAuthentication]
     permission_classes = [IsAuthenticated]
