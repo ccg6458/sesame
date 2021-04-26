@@ -48,7 +48,7 @@ class CURDMixin:
 
     def create(self, request):
         model = self.model
-        model_name = self.model._meta.verbose_name
+        model_name = self.model._meta.model_name
         try:
             data = request.data
             params = data.keys()
