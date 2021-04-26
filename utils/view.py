@@ -1,4 +1,5 @@
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
@@ -118,5 +119,5 @@ class BaseViewSet(ViewSet, BaseResponse, CURDMixin):
     """
     重写ViewSet，添加自定义response方法
     """
-    authentication_classes = (BasicAuthentication, CsrfExemptSessionAuthentication)
+    authentication_classes = (BasicAuthentication, JWTAuthentication)
     permission_classes = [IsAuthenticated]

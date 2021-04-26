@@ -1,6 +1,6 @@
 from utils.view import BaseViewSet
 from rest_framework.decorators import action
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from .models import Host
 
 
@@ -21,6 +21,9 @@ class HostViewSet(BaseViewSet):
         except ObjectDoesNotExist as e:
             self.code = 5000
             self.message = '资源不存在：{}'.format(e.args)
+        except MultipleObjectsReturned as e:
+            self.code = 5000
+            self.message = '查询结果多余一个，请检查数据库：{}'.format(e.args)
         except Exception as e:
             self.code = 5000
             self.message = '未知错误：{}'.format(e.args)
