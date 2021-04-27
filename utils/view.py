@@ -1,5 +1,6 @@
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
@@ -43,9 +44,7 @@ class BaseResponse:
 
 
 class CURDMixin:
-    model = None
-    code = Code.Ok
-    message = Code.default_msg
+
     create_require_params = []  # 执行create方法时的必备参数列表，无则为空
 
     def create(self, request):
@@ -115,9 +114,15 @@ class CURDMixin:
         return BaseResponse.json(self.code, self.message)
 
 
-class BaseViewSet(ViewSet, BaseResponse, CURDMixin):
+class BaseViewSet(PermissionRequiredMixin, ViewSet, BaseResponse, CURDMixin):
     """
     重写ViewSet，添加自定义response方法
     """
     authentication_classes = [BasicAuthentication, CsrfExemptSessionAuthentication, JWTAuthentication]
     permission_classes = [IsAuthenticated]
+
+    # 结合django原生权限系统，对特定接口做权限划分
+    permission_required = []
+    model = None
+    code = Code.Ok
+    message = Code.default_msg
