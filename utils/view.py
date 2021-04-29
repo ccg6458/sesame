@@ -44,7 +44,6 @@ class BaseResponse:
 
 
 class CURDMixin:
-
     create_require_params = []  # 执行create方法时的必备参数列表，无则为空
 
     def create(self, request):
